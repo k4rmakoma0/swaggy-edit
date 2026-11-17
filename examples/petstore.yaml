@@ -1,0 +1,117 @@
+openapi: 3.0.3
+info:
+  title: Petstore API
+  version: 1.0.0
+  description: |
+    A little home for your API.
+    Explore pets, create a new companion, and keep your catalog up to date.
+  license:
+    name: MIT
+servers:
+  - url: https://api.example.com/v1
+    description: Production
+tags:
+  - name: Pets
+    description: Everything about your pets
+paths:
+  /pets:
+    get:
+      tags: [Pets]
+      summary: List all pets
+      operationId: listPets
+      description: Returns a paginated collection of pets in your catalog.
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of pets to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: A collection of pets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
+              example:
+                - id: 1
+                  name: Milo
+                  status: available
+        '400':
+          description: Invalid query parameters
+    post:
+      tags: [Pets]
+      summary: Create a pet
+      operationId: createPet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPet'
+      responses:
+        '201':
+          description: Pet created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+  /pets/{petId}:
+    parameters:
+      - name: petId
+        in: path
+        required: true
+        description: Unique identifier of the pet
+        schema:
+          type: integer
+    get:
+      tags: [Pets]
+      summary: Find a pet by ID
+      operationId: getPet
+      responses:
+        '200':
+          description: The requested pet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '404':
+          description: Pet not found
+    delete:
+      tags: [Pets]
+      summary: Delete a pet
+      operationId: deletePet
+      responses:
+        '204':
+          description: Pet deleted
+components:
+  schemas:
+    Pet:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: Milo
+        status:
+          type: string
+          enum: [available, adopted]
+    NewPet:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        status:
+          type: string
+          enum: [available, adopted]

@@ -1,0 +1,24 @@
+{
+  "app": {
+    "macOSPrivateApi": true,
+    "windows": [{
+      "label": "main",
+      "title": "Swaggy",
+      "width": 1440,
+      "height": 940,
+      "minWidth": 900,
+      "minHeight": 600,
+      "transparent": true,
+      "backgroundColor": "#00000000",
+      "titleBarStyle": "Overlay",
+      "hiddenTitle": true,
+      "trafficLightPosition": {"x": 20, "y": 27},
+      "windowEffects": {
+        "effects": ["liquidGlassRegular", "sidebar"],
+        "state": "followsWindowActiveState",
+        "radius": 14
+      }
+    }]
+  },
+  "bundle": {"macOS": {"minimumSystemVersion": "12.0"}}
+}

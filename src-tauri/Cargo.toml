@@ -1,0 +1,18 @@
+[package]
+name = "swaggy"
+version = "0.1.0"
+edition = "2024"
+description = "A native OpenAPI workspace for macOS, Windows and Linux"
+license = "MIT"
+
+[build-dependencies]
+tauri-build = { version = "2.7", features = [] }
+
+[dependencies]
+tauri = { version = "2.12", features = ["macos-private-api"] }
+rfd = "0.18"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+serde-saphyr = "2.1"
+tempfile = "3"
+percent-encoding = "2"
