@@ -33,6 +33,16 @@ The frontend is HTML/CSS/TypeScript; it is not a SwiftUI, WinUI, or GTK widget i
 
 The UI is in Spanish; code and examples are in English. **Archivo → Abrir ejemplo Petstore** opens the included editable example.
 
+## Install on macOS with Homebrew
+
+```sh
+brew install --cask k4rmakoma0/tap/swaggy
+```
+
+Requires macOS 12 or later and supports both Apple Silicon and Intel. The cask uses the Developer ID signed and notarized release DMG and installs **Swaggy Edit.app**, allowing it to coexist with other applications named Swaggy.
+
+If your Homebrew version requires explicit trust for third-party casks, follow the [tap setup instructions](https://github.com/k4rmakoma0/homebrew-tap#swaggy).
+
 ## Development
 
 Install a stable Rust toolchain and Node.js 24+ with npm. Follow the platform prerequisites in the [Tauri setup guide](https://v2.tauri.app/start/prerequisites/).
