@@ -23,7 +23,7 @@ jobs:
         run: npm run tauri -- build --ci --target universal-apple-darwin --bundles app -- --locked
       - name: Verify architectures and preserve bundle permissions
         run: |
-          lipo -verify_arch arm64 x86_64 target/universal-apple-darwin/release/bundle/macos/Swaggy.app/Contents/MacOS/swaggy
+          lipo target/universal-apple-darwin/release/bundle/macos/Swaggy.app/Contents/MacOS/swaggy -verify_arch arm64 x86_64
           tar -czf Swaggy-macOS-universal.app.tar.gz -C target/universal-apple-darwin/release/bundle/macos Swaggy.app
       - uses: actions/upload-artifact@v4
         with:
