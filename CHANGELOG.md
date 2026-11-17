@@ -9,4 +9,4 @@
 - Conversion preserves API data, updates syntax and filename suggestions, and supports undo/redo of both text and format. YAML comments and anchors are rewritten after confirmation.
 - Native open/save dialogs, atomic saving, external-modification detection, and unsaved-change protection.
 
-Local macOS builds are verified. Windows and Linux still require native execution and visual validation. OpenAPI validation covers syntax and basic structure, not complete specification conformance. Public distribution signing/notarization is not configured.
+Automated frontend/Rust checks pass on macOS, Windows, and Linux. Release workflows generate platform installers and a universal macOS bundle for local Developer ID signing and notarization. Only macOS has been checked interactively; Windows and Linux still require interactive and visual validation. OpenAPI validation covers syntax and basic structure, not complete specification conformance.

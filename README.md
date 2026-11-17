@@ -109,7 +109,15 @@ External file/HTTP references are reported but never fetched. Bundle multi-file 
 
 Descriptions support sanitized Markdown. Remote images, embedded media, active HTML, and external links are disabled. Specifications cannot initiate API requests. There is no request execution, code generation, automatic API-version migration, or unsaved-document crash recovery. Formatting/conversion removes comments and expands YAML anchors. External-edit detection does not provide file locking against simultaneous writers.
 
-Only macOS has been built and checked interactively in this workspace. Windows and Linux have platform-specific styles and a CI matrix, but require execution and visual validation on those systems. The GitHub Actions workflow has not been run here.
+Frontend tests, Rust tests, formatting, and Clippy run on macOS, Windows, and Linux in GitHub Actions. The workflow also builds Windows NSIS/MSI installers and Linux Debian/AppImage packages. Only macOS has been checked interactively; Windows and Linux still require interactive and visual validation on those systems.
+
+## Release builds
+
+The `Build and test` workflow produces installers as workflow artifacts. Linux packages are built on Ubuntu 22.04 with WebKitGTK 4.1; compatible system libraries are required. Windows installers target x64 and are not Authenticode signed.
+
+Run `Build universal macOS release` manually to build a single macOS 12+ application for both Apple Silicon and Intel. Its artifact is a tar archive to preserve bundle permissions. This CI bundle is not a distribution-signed download: releases are signed locally with Developer ID, packaged as a DMG, submitted to Apple's notarization service, and stapled before publication. Certificates and notarization credentials remain in the local keychain.
+
+For local notarization, create a keychain profile using `xcrun notarytool store-credentials`, then submit the signed DMG with `xcrun notarytool submit <installer.dmg> --keychain-profile <profile> --wait`. After Apple accepts it, run `xcrun stapler staple <installer.dmg>` and `xcrun stapler validate <installer.dmg>`. Publish the verified installers and their SHA-256 checksums together in [GitHub Releases](https://github.com/k4rmakoma0/swaggy-edit/releases).
 
 The installed development toolchain currently reports an upstream `picomatch` advisory through Vite/Vitest. It is used for development/build-time file matching and is not included in the shipped application. No patched `picomatch` release was available in the registry at verification time. Production dependencies pass `npm audit --omit=dev`.
 
