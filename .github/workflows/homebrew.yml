@@ -1,0 +1,74 @@
+name: Update Homebrew cask
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Stable release tag (empty uses latest)
+        required: false
+        type: string
+  pull_request:
+    paths:
+      - .github/workflows/homebrew.yml
+      - scripts/update-homebrew-cask.py
+      - scripts/tests/**
+permissions:
+  contents: read
+concurrency:
+  group: homebrew-${{ github.event_name == 'pull_request' && github.ref || 'release' }}
+  cancel-in-progress: false
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: python3 -m unittest discover -s scripts/tests -v
+  update:
+    needs: test
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'release' && !github.event.release.prerelease)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check tap credential
+        env:
+          TAP_KEY: ${{ secrets.HOMEBREW_TAP_DEPLOY_KEY }}
+        run: |
+          if [[ -z "$TAP_KEY" ]]; then
+            echo "::error::Configure HOMEBREW_TAP_DEPLOY_KEY with a write deploy key for k4rmakoma0/homebrew-tap."
+            exit 1
+          fi
+      - name: Check out Homebrew tap
+        uses: actions/checkout@v4
+        with:
+          repository: k4rmakoma0/homebrew-tap
+          ref: main
+          path: homebrew-tap
+          ssh-key: ${{ secrets.HOMEBREW_TAP_DEPLOY_KEY }}
+      - name: Verify release and update cask
+        id: cask
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: python3 scripts/update-homebrew-cask.py --tag "$RELEASE_TAG" --cask homebrew-tap/Casks/swaggy.rb
+      - name: Publish cask update
+        working-directory: homebrew-tap
+        env:
+          CHANGED: ${{ steps.cask.outputs.changed }}
+        run: |
+          if [[ "$CHANGED" == "true" ]]; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add Casks/swaggy.rb
+            git diff --cached --check
+            git commit -m 'Update Swaggy cask from published release'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          else
+            # Check write authentication even when the current cask needs no update.
+            git push --dry-run origin HEAD:main
+          fi

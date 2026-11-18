@@ -129,6 +129,22 @@ Run `Build universal macOS release` manually to build a single macOS 12+ applica
 
 For local notarization, create a keychain profile using `xcrun notarytool store-credentials`, then submit the signed DMG with `xcrun notarytool submit <installer.dmg> --keychain-profile <profile> --wait`. After Apple accepts it, run `xcrun stapler staple <installer.dmg>` and `xcrun stapler validate <installer.dmg>`. Publish the verified installers and their SHA-256 checksums together in [GitHub Releases](https://github.com/k4rmakoma0/swaggy-edit/releases).
 
+### Automatic Homebrew updates
+
+Publishing a stable release triggers `.github/workflows/homebrew.yml`. It downloads `Swaggy_<version>_universal.dmg` and `SHA256SUMS.txt`, verifies both against GitHub's asset digests, validates the Developer ID signature and stapled notarization ticket, then commits only the new version and checksum to `Casks/swaggy.rb` in `k4rmakoma0/homebrew-tap`.
+
+Upload the final notarized and stapled DMG and its matching checksum manifest **before publishing**. Tags must use `vMAJOR.MINOR.PATCH`. Drafts, prereleases, and releases that are not the latest stable release do not update the tap. Downgrades and unverified downloads are rejected. Re-running an already synchronized release does not create a commit.
+
+The repository secret `HOMEBREW_TAP_DEPLOY_KEY` holds a dedicated SSH deploy key with write access only to the tap. The tap's Deploy Keys settings contain its public key under **Swaggy release cask updater**. Rotate it by replacing that deploy key and updating the secret; do not reuse a personal SSH key or commit credentials.
+
+To retry after correcting assets or credentials:
+
+```sh
+gh workflow run homebrew.yml --repo k4rmakoma0/swaggy-edit -f tag=v0.1.0
+```
+
+GitHub does not trigger a release workflow when another workflow publishes the release using its default `GITHUB_TOKEN`. If release publishing is later automated with that token, explicitly dispatch `homebrew.yml` after publishing. Releases published through the GitHub UI or the current authenticated `gh` CLI trigger it normally.
+
 The installed development toolchain currently reports an upstream `picomatch` advisory through Vite/Vitest. It is used for development/build-time file matching and is not included in the shipped application. No patched `picomatch` release was available in the registry at verification time. Production dependencies pass `npm audit --omit=dev`.
 
 ## Checks
